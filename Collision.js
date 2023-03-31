@@ -22,7 +22,15 @@ class Cuboid {
     return new Range(this.z, this.z + this.depth);
   }
 
+  collide(other) {
+    return this.#x_range.collide(other.#x_range) && this.#y_range.collide(other.#y_range) && this.#z_range.collide(other.#z_range);
+  }
+
   overlap(other) {
+    if (!this.collide(other)) {
+      throw 'Cuboids do not collide.';
+    }
+
     const x_overlap = this.#x_range.overlap(other.#x_range);
     const y_overlap = this.#y_range.overlap(other.#y_range);
     const z_overlap = this.#z_range.overlap(other.#z_range);
