@@ -161,10 +161,20 @@ function createProgram(gl, vertex_shader_source, fragment_shader_source) {
     indices: index_buffer,
   };
 
-  draw(gl, program_info, buffers);
+  function drawAnimationFrame(now) {
+    draw(gl, program_info, buffers);
+    requestAnimationFrame(drawAnimationFrame);
+  };
 
+  requestAnimationFrame(drawAnimationFrame);
   console.log("done");
 })();
+
+var rotation = {
+  x: 0.1,
+  y: 0.1,
+  z: 0.1,
+};
 
 function draw(gl, program_info, buffers){
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -183,11 +193,13 @@ function draw(gl, program_info, buffers){
   mat4.perspective(projection_matrix, field_of_view, aspect, z_near, z_far);
 
   const model_view_matrix = mat4.create();
-  mat4.translate(model_view_matrix, model_view_matrix, [0.0, 0.0, -5.0]);
 
-  mat4.rotate(model_view_matrix, model_view_matrix, 0.6, [1, 0, 0]);
-  mat4.rotate(model_view_matrix, model_view_matrix, 0.1, [0, 1, 0]);
-  mat4.rotate(model_view_matrix, model_view_matrix, 0.31, [0, 0, 1]);
+  mat4.translate(model_view_matrix, model_view_matrix, [0.0, 0.0, -6.0]);
+
+  mat4.rotate(model_view_matrix, model_view_matrix, rotation.y, [1, 0, 0]);
+  mat4.rotate(model_view_matrix, model_view_matrix, rotation.x, [0, 1, 0]);
+  //mat4.rotate(model_view_matrix, model_view_matrix, rotation.z, [0, 0, 1]);
+
 
   setPositionAttribute(gl, buffers, program_info)
   setColorAttribute(gl, buffers, program_info)
@@ -240,5 +252,45 @@ function setColorAttribute(gl, buffers, programInfo) {
     offset
   );
   gl.enableVertexAttribArray(programInfo.attrib_locations.vertex_color);
-}
+};
 
+var rotation_is_active = false;
+var last_position = {
+  x: 0,
+  y: 0,
+};
+
+onmousedown = (event) => {
+  last_position.x = event.pageX;
+  last_position.y = event.pageY;
+
+  rotation_is_active = true;
+
+  event.preventDefault();
+};
+
+onmouseup = (event) => {
+  rotation_is_active = false;
+
+  event.preventDefault();
+};
+
+onmousemove = (event) => {
+  if (!rotation_is_active) {
+    return;
+  }
+
+  const offset_x = event.pageX;
+  const x_diff = (offset_x - last_position.x);
+  last_position.x = offset_x;
+
+  rotation.x += x_diff * 0.01;
+
+  const offset_y = event.pageY;
+  const y_diff = (offset_y - last_position.y);
+  last_position.y = offset_y;
+
+  rotation.y += y_diff * 0.01;
+
+  event.preventDefault();
+};
