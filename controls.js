@@ -176,6 +176,8 @@ var rotation = {
   z: 0.1,
 };
 
+var zoom = 6.0;
+
 function draw(gl, program_info, buffers){
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clearDepth(1.0);
@@ -194,7 +196,7 @@ function draw(gl, program_info, buffers){
 
   const model_view_matrix = mat4.create();
 
-  mat4.translate(model_view_matrix, model_view_matrix, [0.0, 0.0, -6.0]);
+  mat4.translate(model_view_matrix, model_view_matrix, [0.0, 0.0, -zoom]);
 
   mat4.rotate(model_view_matrix, model_view_matrix, rotation.y, [1, 0, 0]);
   mat4.rotate(model_view_matrix, model_view_matrix, rotation.x, [0, 1, 0]);
@@ -280,17 +282,26 @@ onmousemove = (event) => {
     return;
   }
 
+
   const offset_x = event.pageX;
   const x_diff = (offset_x - last_position.x);
   last_position.x = offset_x;
-
-  rotation.x += x_diff * 0.01;
 
   const offset_y = event.pageY;
   const y_diff = (offset_y - last_position.y);
   last_position.y = offset_y;
 
-  rotation.y += y_diff * 0.01;
+
+  if (event.altKey) {
+    zoom += -y_diff * 0.01;
+  } else {
+    rotation.x += x_diff * 0.01;
+    rotation.y += y_diff * 0.01;
+  }
 
   event.preventDefault();
+};
+
+onwheel= (event) => {
+  console.log("wheel");
 };
