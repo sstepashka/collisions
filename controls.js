@@ -26,7 +26,9 @@ const kFragmentShaderSource =`
   uniform sampler2D uSampler;
 
   void main() {
-     gl_FragColor = vColor + texture2D(uSampler, vTextureCoord);
+     //gl_FragColor = vColor + texture2D(uSampler, vTextureCoord);
+     lowp vec4 texture_color = texture2D(uSampler, vTextureCoord);
+     gl_FragColor = (1.0 - texture_color.a) * vColor;
   }
 `;
 
